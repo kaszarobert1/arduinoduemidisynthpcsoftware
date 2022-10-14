@@ -1,0 +1,52 @@
+DUEX 7 Conrol Program
+
+Ezzel a programmal MIDIN keresztül vezérelheted az Arduino Due fm szintidet!
+A legtöbb paramétert csúszka segítségével változtathatod. Ez ilyenkor szabványos MIDI kontroller jelet küld az eszköznek. Beállíthatod mind a 6 operátor burkológörbéjét, az alap algoritmust! A hullámformákat illetve azok léptetését "darabolását". A Burkológörbe sebességét stb.
+
+#
+
+Alap hangszínbeállítások:
+
+Waveform - op1-op6-ig a generátorok hullámformáját
+Freq - Az alap hangolási frekvenciát. 
+Fixfreq - Ha a generátor hangolása fixed, akkor finomhangolhatod annak frekvenciáját
+Feedback - Bizonyos operátoroknál a visszacsatolás mértékét.
+Step Bit - Az alaphullámforma léptetése "darabolása". Alapérték a 22-es. Ez a teljes hullámformának felel meg.
+OPLevel - A modulációk erőssége. Mind a 6 operátorra hat.
+Algorithm - Az operátorok vivő mdulátor szerepek alapbeállításai
+Detune - A Pichop 0-a értékénélnem hat a burkológörbe. Ilyenkor finomhangolhatóak az operátok frekvenciái.
+Level - A hangszin hangereje. Csökkentheted a torzítást, de torzító esetén akár érdemes lehet túlvezérelni is a hangot.
+
+#
+
+Burkológörbe:
+
+Volume - Az operátor hangereje
+AL - Attack Level
+AR - Attack Released
+D1L - Decay Level
+D1R - Decay Released
+D2L - Sustem Level
+D2R - Sustem Released
+RL - Released Level
+RR - Released Released
+
+#
+
+Global Parameters:
+Frame - A hangszin sebessége. Mindenre hat!
+Limitgain - Tulajdonképpen egy beépített torzító. Segíthet kordában tartani a hangot.
+Tune Div - Az osztó frekvencia az alaphangoláshoz.
+LFO Mode - Amplitúdó és freq moduláció variációk az LFO-val.
+LFO Freq - Az LFO frekvenciája
+
+#
+
+Effect Parameterek:
+
+Reverb Level - A zengetés erőssége
+Reverb Diffuse - A zengető visszacsatolása
+Chorus Level - A kórus erőssége
+Chorus Freq - A kórus frekvenciája
+
+
