@@ -146,7 +146,28 @@ namespace SequencerDemo
         int ofset;
         int maxrelease = 100;
         int maxtime = 150;
-
+        int delaytime = 0;
+        int delay2time = 0;
+        int mastertune=140;
+        int pareqfreq1 = 0;
+        int pareqfreq2 = 0;
+        int Q1 = 0;
+        int Q2 = 0;
+        int lfo1value = 22;
+        int lfo1min = 1;
+        int lfo1max = 40;
+        int lfo1irany = 1;
+        int lfo2delay = 20;
+        int parametereqlefton = 1;
+        int delaylowpasseqlefton = 1;
+        int highpasslefteqon = 1;
+        int limiterlefton=1;
+        int parametereqrighton=1;
+        int delaylowpasseqrighton = 1;
+        int highpassrighteqon=1;
+        int limiterrighton=1;
+        int eqvalue=0;
+        string pachname = "****************";
         private bool scrolling = false;
 
         private bool playing = false;
@@ -439,7 +460,7 @@ namespace SequencerDemo
 
         private void HandleLoadProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            toolStripProgressBar1.Value = e.ProgressPercentage;
+           // toolStripProgressBar1.Value = e.ProgressPercentage;
         }
 
         private void HandleLoadCompleted(object sender, AsyncCompletedEventArgs e)
@@ -449,12 +470,12 @@ namespace SequencerDemo
             continueButton.Enabled = true;
             stopButton.Enabled = true;
             openToolStripMenuItem.Enabled = true;
-            toolStripProgressBar1.Value = 0;
+           // toolStripProgressBar1.Value = 0;
 
             if(e.Error == null)
             {
-                positionHScrollBar.Value = 0;
-                positionHScrollBar.Maximum = sequence1.GetLength();
+               // positionHScrollBar.Value = 0;
+               // positionHScrollBar.Maximum = sequence1.GetLength();
             }
             else
             {
@@ -534,10 +555,7 @@ namespace SequencerDemo
         }
         
         
-        int lfo1value = 22;
-        int lfo1min = 20;
-        int lfo1max = 23;
-        int lfo1irany = 1;
+        
         private void timer1_Tick(object sender, EventArgs e)
         {
            
@@ -551,7 +569,8 @@ namespace SequencerDemo
                 if (lfo1irany == 1) {
                     if (lfo1value<lfo1max)
                     {
-                        lfo1value++;
+                        lfo1value+=1;
+                        if (lfo1value>lfo1max) { lfo1value = lfo1max; }
                     }
                     else
                     {
@@ -562,7 +581,8 @@ namespace SequencerDemo
                 {
                     if (lfo1value > lfo1min)
                     {
-                        lfo1value--;
+                        lfo1value-=1;
+                        if (lfo1value < lfo1min) { lfo1value = lfo1min; }
                     }
                     else
                     {
@@ -570,9 +590,10 @@ namespace SequencerDemo
                     }
 
                 }
-               int value = (lfo1value - 13) * 8;
-                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 82, value));
-               
+                int value = lfo1value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 96, value));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 94, value));
+
             }
         }
 
@@ -715,25 +736,26 @@ namespace SequencerDemo
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {
             
-            if (comboBox1.SelectedIndex == 0)
-            { 
+            if (comboBox1.SelectedIndex == 0 && outDeviceID != 0)
+            {
+                
                 outDeviceID = 0;
                 outDevice = new OutputDevice(outDeviceID);
                 
             }
 
-            if (comboBox1.SelectedIndex == 1) {
+            if (comboBox1.SelectedIndex == 1 && outDeviceID != 1) {
                 outDeviceID = 1;        
                 outDevice = new OutputDevice(outDeviceID);
                 label56.Text = Sanford.Multimedia.Midi.OutputDevice.DeviceCount+"";
             }
-            if (comboBox1.SelectedIndex == 2)
+            if (comboBox1.SelectedIndex == 2 && outDeviceID != 2)
             {
                 outDeviceID = 2;
           
                 outDevice = new OutputDevice(outDeviceID);
             }
-            if (comboBox1.SelectedIndex == 3)
+            if (comboBox1.SelectedIndex == 3 && outDeviceID != 3)
             {
                 outDeviceID = 3;
                 outDevice = new OutputDevice(outDeviceID);
@@ -782,57 +804,68 @@ namespace SequencerDemo
         void initvariable() {
             string[] sor = richTextBox2.Text.Split('\n');
             StreamWriter sw = new StreamWriter("lastopen.log");
-            for (int i = 0; i < sor.Length-1; i++)
+            for (int i = 0; i < sor.Length - 1; i++)
             {
-                
+
                 progressBar1.Maximum = sor.Length;
                 progressBar1.Value = i;
                 string[] darabok = sor[i].Split('=');
                 string variablename = darabok[0].Trim();
-                int value =Convert.ToInt32( darabok[1].Substring(0,darabok[1].Length-1).Trim());
-                // label56.Text = variablename+"#"+value+"#";
-                if (variablename.Contains("op1"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
-                    opmenu = 1;
-                }
-                if (variablename.Contains("op2"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
-                    opmenu = 2;
-                }
-                if (variablename.Contains("op3"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 56));
-                    opmenu = 3;
-                }
-                if (variablename.Contains("op4"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 57));
-                    opmenu = 4;
-                }
-                if (variablename.Contains("op5"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 58));
-                    opmenu = 5;
-                }
-                if (variablename.Contains("op6"))
-                { outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 59));
-                    opmenu = 6;
-                }
-                if (variablename.Contains("pich")&& !variablename.Contains("op"))
-                {
-                    opmenu = 7;
-                    outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+               
+                
+                    int value = Convert.ToInt32(darabok[1].Substring(0, darabok[1].Length - 1).Trim());
+                    // label56.Text = variablename+"#"+value+"#";
+                    if (variablename.Contains("op1"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                        opmenu = 1;
+                    }
+                    if (variablename.Contains("op2"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                        opmenu = 2;
+                    }
+                    if (variablename.Contains("op3"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 56));
+                        opmenu = 3;
+                    }
+                    if (variablename.Contains("op4"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 57));
+                        opmenu = 4;
+                    }
+                    if (variablename.Contains("op5"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 58));
+                        opmenu = 5;
+                    }
+                    if (variablename.Contains("op6"))
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 59));
+                        opmenu = 6;
+                    }
+                    if (variablename.Contains("pich") && !variablename.Contains("op"))
+                    {
+                        opmenu = 7;
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                        Thread.Sleep(10);
+                        outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 53));
+                    }
+
                     Thread.Sleep(10);
-                    outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 53));
-                }
-                Thread.Sleep(10);
-                try
-                {
-                    sw.WriteLine(variablename + "=" + value+" (op"+opmenu+")");
-                    parameterset(variablename, value);
-                }
-                catch (Exception e){
-                    MessageBox.Show("A hiba a fájl"+i+"sorában!");
-                    throw;
-                }
-                Thread.Sleep(10);
+                    try
+                    {
+                        sw.WriteLine(variablename + "=" + value + " (op" + opmenu + ")");
+                        parameterset(variablename, value);
+                    }
+                    catch (Exception e)
+                    {
+                        MessageBox.Show("A hiba a fájl" + i + "sorában!");
+                        throw;
+                    }
+                    Thread.Sleep(10);
+                
             }
             sw.Close();
             initglobaltrackbar();
@@ -896,7 +929,7 @@ namespace SequencerDemo
             //Reverb diffuse
           
             int value = trackBar85.Value;
-            variableset("reverbdiffuse", value);          
+            variableset("eqvalue", value);          
             label56.Text = value.ToString();
             
         }
@@ -931,74 +964,99 @@ namespace SequencerDemo
         }
 
         int prog;
+        void lcdkiir() {
+            openFileDialog1.FileName="prog0.esp";
+            // initvariable();
+           
+            initglobaltrackbar();
+            maxreleaseset();
+            
+            string[] prognames = { "Jump 01    ", "Progname2", "Progname3", "Progname4", "Progname5", "Progname6", "Progname7", "Progname8", "Progname9", "Progname10" };
+            label28.Text = "P" +prog+": "+ prognames[prog];
+            label29.Text = "Alg: " + algorithm + " Lev: " + level;
+
+        }
         private void button2_Click(object sender, EventArgs e)
         {
+            StreamReader r = new StreamReader("prog0.esp", Encoding.Default);
+            richTextBox2.Text = r.ReadToEnd();
+            initvariable();
+            op1volumelast = op1volume;
+            op2volumelast = op1volume;
+            op3volumelast = op1volume;
+            op4volumelast = op1volume;
+            op5volumelast = op1volume;
+            op6volumelast = op1volume;
+            r.Close();
+
+
             prog = 0;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange,0,prog));
-            label93.Text = prog + "";
+            lcdkiir();
+            
         }
 
         private void button3_Click(object sender, EventArgs e)
         {
             prog = 1;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button4_Click(object sender, EventArgs e)
         {
             prog = 2;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            //lcdkiir();
         }
 
         private void button5_Click(object sender, EventArgs e)
         {
             prog = 3;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button6_Click(object sender, EventArgs e)
         {
             prog = 4;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button7_Click(object sender, EventArgs e)
         {
             prog = 5;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button8_Click(object sender, EventArgs e)
         {
             prog = 6;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button9_Click(object sender, EventArgs e)
         {
             prog = 7;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button10_Click(object sender, EventArgs e)
         {
             prog = 8;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button11_Click(object sender, EventArgs e)
         {
             prog = 9;
             outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, prog));
-            label93.Text = prog + "";
+            lcdkiir();
         }
 
         private void button12_Click(object sender, EventArgs e)
@@ -1019,9 +1077,9 @@ namespace SequencerDemo
             groupBox1.Text =  "OP"+ opmenu;
             groupBox7.Text = "OP" + opmenu;
             groupBox1.ForeColor = Color.White;
-            groupBox1.BackColor = Color.Green;
+            groupBox1.BackColor = Color.Teal;
             groupBox7.ForeColor = Color.White;
-            groupBox7.BackColor = Color.Green;
+            groupBox7.BackColor = Color.Teal;
             trackBar1.Value = op1waveform;
             trackBar21.Value = op1volume;
             trackBar23.Value =op1generatorfreq;
@@ -1035,6 +1093,7 @@ namespace SequencerDemo
             trackBar11.Value = op1rl;
             trackBar12.Value = op1rr;
             trackBar37.Value = op1lep;
+            trackBar38.Value = op1detune;
             trackBar57.Value = op1pich;
         }
 
@@ -1064,6 +1123,7 @@ namespace SequencerDemo
             trackBar11.Value = op2rl;
             trackBar12.Value = op2rr;
             trackBar37.Value = op2lep;
+            trackBar38.Value = op2detune;
             trackBar57.Value = op2pich;
         }
 
@@ -1092,6 +1152,7 @@ namespace SequencerDemo
             trackBar11.Value = op3rl;
             trackBar12.Value = op3rr;
             trackBar37.Value = op3lep;
+            trackBar38.Value = op3detune;
             trackBar57.Value = op3pich;
 
         }
@@ -1104,10 +1165,10 @@ namespace SequencerDemo
         
             groupBox1.Text = "OP" + opmenu;
             groupBox7.Text = "OP" + opmenu;
-            groupBox1.BackColor = Color.Goldenrod;
-            groupBox1.ForeColor = Color.White;
-            groupBox7.BackColor = Color.Goldenrod;
-            groupBox7.ForeColor = Color.White;
+            groupBox1.BackColor = Color.LemonChiffon;
+            groupBox1.ForeColor = Color.FromArgb(55, 158, 215);
+            groupBox7.BackColor = Color.LemonChiffon;
+            groupBox7.ForeColor = Color.FromArgb(55, 158, 215);
             trackBar1.Value = op4waveform;
             trackBar21.Value = op4volume;
             trackBar23.Value = op4generatorfreq;
@@ -1121,6 +1182,7 @@ namespace SequencerDemo
             trackBar11.Value = op4rl;
             trackBar12.Value = op4rr;
             trackBar37.Value = op4lep;
+            trackBar38.Value = op4detune;
             trackBar57.Value = op4pich;
 
         }
@@ -1150,6 +1212,7 @@ namespace SequencerDemo
             trackBar11.Value = op5rl;
             trackBar12.Value = op5rr;
             trackBar37.Value = op5lep;
+            trackBar38.Value = op5detune;
             trackBar57.Value = op5pich;
 
         }
@@ -1179,6 +1242,7 @@ namespace SequencerDemo
             trackBar11.Value = op6rl;
             trackBar12.Value = op6rr;
             trackBar37.Value = op6lep;
+            trackBar38.Value = op6detune;
             trackBar57.Value = op6pich;
         }
 
@@ -1189,9 +1253,9 @@ namespace SequencerDemo
             outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
             outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 53));
             groupBox1.Text = "PICH";
-            groupBox1.BackColor = Color.HotPink;
+            groupBox1.BackColor = Color.FromArgb(55, 158, 215);
             groupBox1.ForeColor = Color.White;
-            groupBox7.BackColor = Color.HotPink;
+            groupBox7.BackColor = Color.FromArgb(55, 158, 215);
             groupBox7.ForeColor = Color.White;
             groupBox7.Text = "PICH" + opmenu;                  
             trackBar5.Value = pichal;
@@ -1365,6 +1429,14 @@ namespace SequencerDemo
 
         private void button15_Click(object sender, EventArgs e)
         {
+            string file = "init.esp";
+            
+            string[] splits = file.Split('\\');
+            label4.Text = splits[splits.Length - 1].ToUpper();
+            StreamReader r = new StreamReader(file, Encoding.Default);
+            richTextBox2.Text = r.ReadToEnd();
+            r.Close();
+
             openFileDialog1.ShowDialog();
             initvariable();
             op1volumelast = op1volume;
@@ -1379,6 +1451,13 @@ namespace SequencerDemo
         private void button16_Click(object sender, EventArgs e)
         {
            
+            initvariable();
+            op1volumelast = op1volume;
+            op2volumelast = op1volume;
+            op3volumelast = op1volume;
+            op4volumelast = op1volume;
+            op5volumelast = op1volume;
+            op6volumelast = op1volume;
         }
         public void gorberajzol()
         {
@@ -1629,7 +1708,8 @@ namespace SequencerDemo
 
         private void button17_Click(object sender, EventArgs e)
         {
-            initvariable();
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 37, 1));
+            
         }
 
 
@@ -1650,7 +1730,7 @@ namespace SequencerDemo
 
         private void trackBar63_Scroll_1(object sender, EventArgs e)
         {
-            //lfovolume
+            //lfofreq
             int value = trackBar63.Value;
             variableset("lfo2freq", value);
             label56.Text = value + " ";
@@ -1670,7 +1750,7 @@ namespace SequencerDemo
         public void parameterset(string variablename, int value)
         {
 
-            if (variablename.Contains("al"))
+            if (variablename.Contains("al") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1684,7 +1764,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 108, value));
             }
-            if (variablename.Contains("ar"))
+            if (variablename.Contains("ar") && variablename.Contains("op"))           
             {
                 switch (opmenu)
                 {
@@ -1699,7 +1779,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 114, value));
             }
 
-            if (variablename.Contains("d1l"))
+            if (variablename.Contains("d1l") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1713,7 +1793,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 109, value));
             }
-            if (variablename.Contains("d1r"))
+            if (variablename.Contains("d1r") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1728,7 +1808,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 115, value));
             }
 
-            if (variablename.Contains("d2l"))
+            if (variablename.Contains("d2l") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1743,7 +1823,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 110, value));
             }
 
-            if (variablename.Contains("d2r"))
+            if (variablename.Contains("d2r") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1758,7 +1838,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 116, value));
             }
 
-            if (variablename.Contains("rl"))
+            if (variablename.Contains("rl") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1772,7 +1852,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 111, value));
             }
-            if (variablename.Contains("rr"))
+            if (variablename.Contains("rr") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1787,7 +1867,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 117, value));
             }
 
-            if (variablename.Contains("detune"))
+            if (variablename.Contains("detune") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1802,7 +1882,7 @@ namespace SequencerDemo
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 113, value));
             }
 
-            if (variablename.Contains("generatorfreq") && !variablename.Contains("fix"))
+            if (variablename.Contains("generatorfreq") && !variablename.Contains("fix") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1815,7 +1895,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 44, value));
             }
-            if (variablename.Contains("generatorfreqfix"))
+            if (variablename.Contains("generatorfreqfix") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1828,7 +1908,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 0, value));
             }
-            if (variablename.Contains("notefixed"))
+            if (variablename.Contains("notefixed") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1852,7 +1932,7 @@ namespace SequencerDemo
             }
 
 
-            if (variablename.Contains("volume"))
+            if (variablename.Contains("volume") && !variablename.Contains("lfo") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1875,7 +1955,7 @@ namespace SequencerDemo
 
             }
 
-            if (variablename.Contains("waveform"))
+            if (variablename.Contains("waveform") && variablename.Contains("op"))
             {
                 switch (opmenu)
                 {
@@ -1888,7 +1968,7 @@ namespace SequencerDemo
                 }
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, value));
             }
-            if (variablename.Contains("lep"))
+            if (variablename.Contains("lep") && variablename.Contains("op"))
             {
 
                 switch (opmenu)
@@ -1923,14 +2003,18 @@ namespace SequencerDemo
             {
                 reverblevel = value;
 
+                opmenu = 1;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 7, value));
 
             }
-            if (variablename == "reverbdiffuse")
+            if (variablename == "reverbdiffusion")
             {
                 reverbdiffuse = value;
 
-                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 105, value));
+                opmenu = 2;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 7, value));
 
             }
             if (variablename == "choruslevel")
@@ -1953,7 +2037,7 @@ namespace SequencerDemo
             if (variablename == "algorithm")
             {
                 algorithm = value;
-                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 40, value + 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 40, value));
             }
             if (variablename == "feedbacklevel")
             {
@@ -1989,6 +2073,11 @@ namespace SequencerDemo
                 lfo2freq = value;
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 104, value));
             }
+            if (variablename == "lfo2delay")
+            {
+                lfo2delay = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 97, value));
+            }
             if (variablename == "modulation")
             {
                 modulation = value;
@@ -2021,14 +2110,123 @@ namespace SequencerDemo
                 ofset = value;
                 outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 48, ofset));
             }
-            // MessageBox.Show(variablename + " " + opmenu + " " + value);
+            if (variablename == "delaytime")
+            {
+                delaytime = value;
+                opmenu = 3;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 56));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 7, value));
+            }
+            if (variablename == "delay2time")
+            {
+                delay2time = value;
+                opmenu = 4;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 57));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 7, value));
+            }
+            if (variablename == "mastertune")
+            {
+                mastertune = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 98, mastertune));
+            }
+            if (variablename == "eqvalue")
+            {
+                eqvalue = value;
+                
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 105, value));
+            }
 
+            if (variablename == "pareqfreq0")
+            {
+                pareqfreq1 = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 94, pareqfreq1));
+            }
+            if (variablename == "Q1")
+            {
+                Q1 = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 95, Q1));
+            }
+            if (variablename == "pareqfreq1")
+            {
+                pareqfreq2 = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 94, pareqfreq2));
+            }
+            if (variablename == "Q2")
+            {
+                Q2 = value;
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 95, Q2));
+            }
+
+
+            if (variablename == "parametereqlefton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 99, parametereqlefton));
+                parametereqlefton = value;
+
+            }
+            if (variablename == "delaylowpasseqlefton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 99, delaylowpasseqlefton));
+                delaylowpasseqlefton = value;
+            } 
+            if (variablename == "highpasslefteqon") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 56));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 99, highpasslefteqon));
+                highpasslefteqon = value;
+            }
+            if (variablename == "limiterlefton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 57));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 99, limiterlefton));
+                limiterlefton = value;
+            }
+            if (variablename == "parametereqrighton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 54));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 100, parametereqrighton));
+                parametereqrighton = value;
+            } 
+            if (variablename == "delaylowpasseqrighton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 55));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 100, delaylowpasseqrighton));
+                delaylowpasseqrighton = value;
+            }
+
+            if (variablename == "highpassrighteqon" )
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 56));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 100, highpassrighteqon));
+                highpassrighteqon = value;
+            }
+
+            if (variablename == "limiterrighton") 
+            {
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 57));
+                outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 100, limiterrighton));
+                limiterrighton = value;
+            }
+
+            // MessageBox.Show(variablename + " " + opmenu + " " + value);
+           
+        if (variablename == "pachname")
+            {
+                pachname = value.ToString();
+                label28.Text = pachname;
+            }
         }
 
 
         public void variableset(string name, int value)
         {
-            if (name == "al" || name == "ar" || name == "d1l" || name == "d1r" || name == "d2l" || name == "d2r" || name == "rl" || name == "rr" || name == "notefixed" || name == "waveform" || name == "generatorfreq" || name == "generatorfreqfix" || name == "volume" || name == "lep" || name == "pich" || name == "detune")
+            if (name == "al" || name == "ar" && !name.Contains( "pareqfreq") || name == "d1l" || name == "d1r" || name == "d2l" || name == "d2r" || name == "rl" || name == "rr" || (name == "notefixed" && opmenu != 7) || (name == "waveform" && opmenu!=7) || (name == "generatorfreq" && opmenu != 7) || (name == "generatorfreqfix" && opmenu != 7) || name == "volume" || (name == "lep"&& opmenu != 7) || (name == "detune" && opmenu != 7) || (name == "pich" && opmenu != 7) )
             {
                 if (opmenu == 7)
                 {
@@ -2045,7 +2243,7 @@ namespace SequencerDemo
 
             }
 
-            if (name == "reverblevel" || name == "reverbdiffuse" || name == "choruslevel" || name == "chorusfreq" || name == "level" || name == "algorithm" || name == "feedbacklevel" || name == "pichkezd" || name == "algorithm" || name == "oplevel" || name == "lfo2volume" || name == "lfo2freq" || name == "modulation" || name == "szorzo" || name == "frame" || name == "reverbtime" || name == "ofset" || name == "limitgain")
+            if (name == "reverblevel" || name == "reverbdiffusion" || name == "choruslevel" || name == "chorusfreq" || name == "level"  || name == "feedbacklevel" || name == "pichkezd" || name == "algorithm" || name == "oplevel" || name == "lfo2volume" || name == "lfo2freq" || name== "lfo2delay" || name == "modulation" || name == "szorzo" || name == "frame" || name == "reverbtime" || name == "ofset" || name == "limitgain" || name == "delaytime" ||  name == "delay2time" || name == "mastertune" || name == "pareqfreq0" || name == "pareqfreq1" || name == "Q1" || name == "Q2" || name == "parametereqlefton" || name == "delaylowpasseqlefton" || name =="highpasslefteqon" || name =="limiterlefton" || name =="parametereqrighton" || name == "delaylowpasseqrighton" || name == "highpassrighteqon" || name == "limiterrighton" || name=="eqvalue" || name == "pachname")
             {
                 parameterset(name, value);
                 opszoveg(name, value);
@@ -2097,12 +2295,28 @@ namespace SequencerDemo
             trackBar13.Maximum = 127;         
             trackBar14.Minimum = 0;
             trackBar14.Maximum = 127;
+            trackBar15.Minimum = 0;
+            trackBar15.Maximum = 32;
+            trackBar16.Minimum = 0;
+            trackBar16.Maximum = 32;
+            trackBar17.Minimum = 0;
+            trackBar17.Maximum = 127;
+            trackBar18.Minimum = 0;
+            trackBar18.Maximum = 127;
+            trackBar19.Minimum = 0;
+            trackBar19.Maximum = 127;
             trackBar21.Minimum = 0;
             trackBar21.Maximum = 127;
+            trackBar20.Minimum = 0;
+            trackBar20.Maximum = 127;
+            trackBar22.Minimum = 0;
+            trackBar22.Maximum = 127;
             trackBar23.Minimum = 0;
             trackBar23.Maximum = 127;
             trackBar24.Minimum = 0;
             trackBar24.Maximum = 127;
+            trackBar25.Minimum = 0;
+            trackBar25.Maximum = 127;
             trackBar31.Minimum = 0;
             trackBar31.Maximum = 127;
             trackBar32.Minimum = 0;
@@ -2115,8 +2329,8 @@ namespace SequencerDemo
             trackBar51.Maximum = 127;
             trackBar54.Minimum = 0;
             trackBar54.Maximum = 127;
-            trackBar55.Minimum = 35;
-            trackBar55.Maximum = 80;
+            trackBar55.Minimum = 0;
+            trackBar55.Maximum = 127;
             trackBar56.Minimum = 32;
             trackBar56.Maximum = 34;
             trackBar57.Minimum = 0;
@@ -2124,7 +2338,7 @@ namespace SequencerDemo
             trackBar60.Minimum = 0;
             trackBar60.Maximum = 127;
             trackBar62.Minimum = 0;
-            trackBar62.Maximum = 32;
+            trackBar62.Maximum = 49;
             trackBar63.Minimum = 1;
             trackBar63.Maximum = 127;
             trackBar84.Minimum = 1;
@@ -2139,17 +2353,105 @@ namespace SequencerDemo
         void initglobaltrackbar()
         {
             trackBar87.Value = reverblevel;
-            trackBar85.Value = reverbdiffuse;
+            trackBar3.Value = reverbdiffuse;
+            trackBar14.Value = limitgain;
+            trackBar15.Value = delaytime;
+            trackBar16.Value = delay2time;
+            trackBar17.Value = mastertune;
+            trackBar18.Value = pareqfreq1;
+            trackBar19.Value = Q1;
+            trackBar20.Value = Q2;
+            trackBar22.Value = pareqfreq2;           
+            trackBar24.Value = level;
+            trackBar25.Value = lfo2delay;
+            trackBar31.Value = modulation;
+            trackBar32.Value = pichkezd;
+            trackBar33.Value = lfo2volume;           
+            trackBar51.Value = szorzo;
+            trackBar54.Value = oplevel;
+            trackBar55.Value = feedbacklevel;
+            trackBar61.Value = frame;
+            trackBar62.Value = algorithm;
+            trackBar63.Value = lfo2freq;
             trackBar86.Value = choruslevel;
             trackBar84.Value = chorusfreq;
-            trackBar55.Value = feedbacklevel;
-            trackBar62.Value = algorithm;
-            trackBar54.Value = oplevel;
+            trackBar85.Value = eqvalue;         
+            
+            label28.Text = pachname;
+
+            if (parametereqlefton==1)
+            {
+                button26.BackColor = Color.Teal;
+            }
+            else
+            {
+                button26.BackColor = Color.Red;
+            }
+            if (parametereqrighton == 1)
+            {
+                button30.BackColor = Color.Teal;
+            }
+            else
+            {
+                button30.BackColor = Color.Red;
+            }
+
+            if (highpasslefteqon == 1)
+            {
+                button28.BackColor = Color.Teal;
+            }
+            else
+            {
+                button28.BackColor = Color.Red;
+            }
+            if (highpassrighteqon == 1)
+            {
+                button32.BackColor = Color.Teal;
+            }
+            else
+            {
+                button32.BackColor = Color.Red;
+            }
+         
+            if (delaylowpasseqlefton == 1)
+            {
+                button27.BackColor = Color.Teal;
+            }
+            else
+            {
+                button27.BackColor = Color.Red;
+            }
+            if (limiterlefton == 1)
+            {
+                button29.BackColor = Color.Teal;
+            }
+            else
+            {
+                button29.BackColor = Color.Red;
+            }
+
+            if (delaylowpasseqrighton == 1)
+            {
+                button31.BackColor = Color.Teal;
+            }
+            else
+            {
+                button31.BackColor = Color.Red;
+            }
+            if (limiterrighton == 1)
+            {
+                button33.BackColor = Color.Teal;
+            }
+            else
+            {
+                button33.BackColor = Color.Red;
+            }
+
         }
 
         private void trackBar2_Scroll(object sender, EventArgs e)
         {
-            timer1.Interval = trackBar2.Value*10;
+            timer1.Interval = trackBar2.Value;
         }
 
         private void timer2_Tick(object sender, EventArgs e)
@@ -2185,7 +2487,7 @@ namespace SequencerDemo
         {
             //reverbtime
             int value = trackBar3.Value;
-            variableset("reverbtime", value);
+            variableset("reverbdiffusion", value);
             label56.Text = value + " ";
         }
 
@@ -2269,6 +2571,250 @@ namespace SequencerDemo
                 variableset("volume", op6volume);
                 label56.Text = op6volume + " ";
             }
+        }
+
+        private void trackBar15_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar15.Value;
+            variableset("delaytime", value);
+            label56.Text = value + " ";
+
+        }
+
+        private void trackBar16_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar16.Value;
+            variableset("delay2time", value);
+            label56.Text = value + " ";
+        }
+
+        private void trackBar17_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar17.Value;
+            variableset("mastertune", value);
+            label56.Text = value + " ";
+        }
+
+        private void trackBar18_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar18.Value;
+            variableset("pareqfreq0", value);
+            label56.Text = value + " ";
+        }
+
+        private void trackBar19_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar19.Value;
+            variableset("Q1", value);
+            label56.Text = value + " ";
+        }
+
+        private void trackBar22_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar22.Value;
+            variableset("pareqfreq1", value);
+            label56.Text = value + " ";
+        }
+
+        private void label25_Click(object sender, EventArgs e)
+        {
+         
+        }
+
+        private void label26_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void trackBar20_Scroll(object sender, EventArgs e)
+        {
+            int value = trackBar20.Value;
+            variableset("Q2", value);
+            label56.Text = value + " ";
+        }
+
+        private void button21_Click(object sender, EventArgs e)
+        {
+            //page++
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 50, 1));
+
+        }
+
+        private void button22_Click(object sender, EventArgs e)
+        {
+            //page++
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 51, 1));
+        }
+
+        private void button23_Click(object sender, EventArgs e)
+        {
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 52));
+        }
+
+        private void button20_Click(object sender, EventArgs e)
+        {
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 6, 53));
+        }
+
+        private void button24_Click(object sender, EventArgs e)
+        {
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 52, 1));
+        }
+
+        private void button25_Click(object sender, EventArgs e)
+        {
+            outDevice.Send(new ChannelMessage(ChannelCommand.Controller, 0, 53, 1));
+        }
+
+        private void trackBar25_Scroll(object sender, EventArgs e)
+        {
+            //lfovolume
+            int value = trackBar25.Value;
+            variableset("lfo2delay", value);
+            label56.Text = value + " ";
+        }
+
+        private void groupBox11_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+
+       
+        private void button26_Click(object sender, EventArgs e)
+        {
+            //parametereqlefton
+            if (parametereqlefton==0) { parametereqlefton = 1; } else { parametereqlefton = 0; }
+            variableset("parametereqlefton", parametereqlefton);
+            label56.Text = parametereqlefton + " ";
+            if (parametereqlefton == 1)
+            {
+                button26.BackColor = Color.Teal;
+            }
+            else
+            {
+                button26.BackColor = Color.Red;
+            }
+
+        }
+
+        private void button27_Click(object sender, EventArgs e)
+        {
+            //delaylowpasseqlefton
+            if (delaylowpasseqlefton == 0) { delaylowpasseqlefton = 1; } else { delaylowpasseqlefton = 0; }
+            variableset("delaylowpasseqlefton", delaylowpasseqlefton);
+            label56.Text = delaylowpasseqlefton + " ";
+            if (delaylowpasseqlefton == 1)
+            {
+                button27.BackColor = Color.Teal;
+            }
+            else
+            {
+                button27.BackColor = Color.Red;
+            }
+        }
+
+        private void button28_Click(object sender, EventArgs e)
+        {
+            //highpasslefteqon
+            if (highpasslefteqon == 0) { highpasslefteqon = 1; } else { highpasslefteqon = 0; }
+            variableset("highpasslefteqon", highpasslefteqon);
+            label56.Text = highpasslefteqon + " ";
+            if (highpasslefteqon == 1)
+            {
+                button28.BackColor = Color.Teal;
+            }
+            else
+            {
+                button28.BackColor = Color.Red;
+            }
+
+        }
+
+        private void button29_Click(object sender, EventArgs e)
+        {
+      
+            //limiterlefton
+            if (limiterlefton == 0) { limiterlefton = 1; } else { limiterlefton = 0; }
+            variableset("limiterlefton", limiterlefton);
+            label56.Text = limiterlefton + " ";
+            if (limiterlefton == 1)
+            {
+                button29.BackColor = Color.Teal;
+            }
+            else
+            {
+                button29.BackColor = Color.Red;
+            }
+        }
+
+        private void button30_Click(object sender, EventArgs e)
+        {
+            //parametereqrighton
+            if (parametereqrighton == 0) { parametereqrighton = 1; } else { parametereqrighton = 0; }
+            variableset("parametereqrighton", parametereqrighton);
+            label56.Text = parametereqrighton + " ";
+            if (parametereqrighton == 1)
+            {
+                button30.BackColor = Color.Teal;
+            }
+            else
+            {
+                button30.BackColor = Color.Red;
+            }
+        }
+
+        private void button31_Click(object sender, EventArgs e)
+        {
+            //delaylowpasseqrighton
+            if (delaylowpasseqrighton == 0) { delaylowpasseqrighton = 1; } else { delaylowpasseqrighton = 0; }
+            variableset("delaylowpasseqrighton", delaylowpasseqrighton);
+            label56.Text = delaylowpasseqrighton + " ";
+            if (delaylowpasseqrighton == 1)
+            {
+                button31.BackColor = Color.Teal;
+            }
+            else
+            {
+                button31.BackColor = Color.Red;
+            }
+        }
+
+        private void button32_Click(object sender, EventArgs e)
+        {
+            //highpassrighteqon
+            if (highpassrighteqon == 0) { highpassrighteqon = 1; } else { highpassrighteqon = 0; }
+            variableset("highpassrighteqon", highpassrighteqon);
+            label56.Text = highpassrighteqon + " ";
+            if (highpassrighteqon == 1)
+            {
+                button32.BackColor = Color.Teal;
+            }
+            else
+            {
+                button32.BackColor = Color.Red;
+            }
+        }
+
+        private void button33_Click(object sender, EventArgs e)
+        {
+            //limiterrighton
+            if (limiterrighton == 0) { limiterrighton = 1; } else { limiterrighton = 0; }
+            variableset("limiterrighton", limiterrighton);
+            label56.Text = limiterrighton + " ";
+            if (limiterrighton == 1)
+            {
+                button33.BackColor = Color.Teal;
+            }
+            else
+            {
+                button33.BackColor = Color.Red;
+            }
+        }
+
+        private void label29_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
